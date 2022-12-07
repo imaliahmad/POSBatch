@@ -1,0 +1,150 @@
+﻿
+@model IEnumerable<MyPOS.ViewModels.BrandMasterVM>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/js/site.js"></script>
+<div class="container-fluid p-0">
+    <div class="mb-3">
+            <h1 class="h3 d-inline align-middle">Brand List</h1>
+            <a id="createNew" onclick="brandAction.slideToggle()" class="badge bg-primary text-white ms-2" href="#" style="text-decoration:none; font-size: 14px;">
+                Create New
+            </a>
+      </div>
+        <div class="row pt-3" id="brandFormDiv">
+            <div class="col-md-12 col-xl-12">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="brandForm">
+                            <fieldset>
+                                <input type="hidden" name="BrandId" id="BrandId" />
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter name" id="Name" name="Name" />
+                                    <div class="form-text text-end">Max Character Limit: 30</div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" rows="2" placeholder="Enter description" id="Description" name="Description"></textarea>
+                                    <div class="form-text text-end">Max Character Limit: 250</div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Status</label>
+                                    <label class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="true" id="IsActive" name="IsActive">
+                                        <span class="form-check-label">Active</span>
+                                    </label>
+                                </div>
+                                <button type="button" class="btn btn-success" id="btnSave" onclick="brandAction.Save()">Save</button>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row card pt-3">
+            <div class="col-md-12 col-xl-12">
+                <table class="table table-bordered table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="brandListDiv">
+                    @if (Model != null && Model.Count() > 0)
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.BrandId</td>
+                                <td>@item.Name</td>
+                                <td>@item.Description</td>
+                                <td>
+                                    <button type="button" class="btn btn-warning" onclick='brandAction.Edit(@item.BrandId, this)'> Edit </button> |
+                                    <button type="button" class="btn btn-danger" onclick='Delete(@item.BrandId, this)'> Delete </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+</div>
+
+<script>
+    //$('#createNew').click(function()
+    //{
+    //    $('#brandFormDiv').slideToggle();
+    //});
+
+    //function SlideToggle()
+    //{
+    //   $('#brandFormDiv').slideToggle();
+    //}
+
+    var brandAction = 
+    {
+        slideToggle: function(){
+             $('#brandFormDiv').slideToggle();
+        },
+        Save: function(){
+           
+            debugger;
+            
+
+            $.ajax({
+               type: 'POST',
+               url: '@Url.Action("CreateOrEdit", "BrandMaster")', // /Controller/Index
+               data: $('#brandForm').serialize(),
+               success: function(response){
+                    debugger;
+
+                    if(response != undefined)
+                    {
+                         if(response.isSuccess)
+                         {
+                                var data = response.data;
+
+                                var row = `<tr>
+                                                    <td>${data.brandId}</td>
+                                                    <td>${data.name}</td>
+                                                    <td>${data.description}</td>
+                                                    <td>
+                                                       <button type="button" class="btn btn-warning" onclick='brandAction.Edit(${data.brandId}, this)'> Edit </button> |
+                                                       <button type="button" class="btn btn-danger" onclick='Delete(${data.brandId}, this)'> Delete </button>
+                                                    </td>
+                                                 </tr>`;
+
+                                  $('#brandListDiv').append(row);
+                                  window.scrollTo(0, 0);
+                                  $('#brandForm')[0].reset();
+                                  $('#brandFormDiv').slideToggle();
+                                 notyf.open({ type: 'success', message: 'Record saved successfully.'  });
+                         }
+                         else
+                         {
+                            notyf.open({ type: 'error', message: response.message  });
+                         }
+                    }
+                    else        
+                    {
+                       notyf.open({ type: 'error', message: "Something went wrong." });
+                    }
+               },
+               error: function(err){
+                  notyf.open({ type: 'error', message: err.statusText });
+               }
+            });
+        
+        }
+    };
+
+</script>
