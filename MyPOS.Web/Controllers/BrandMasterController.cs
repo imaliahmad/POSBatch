@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 using MyPOS.BLL;
+using MyPOS.BOL;
 using MyPOS.ViewModels;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace MyPOS.Web.Controllers
 {
@@ -44,7 +49,16 @@ namespace MyPOS.Web.Controllers
         public IActionResult CreateOrEdit(BrandMasterVM model)
         {
             try
-            {               
+            {
+                if (!ModelState.IsValid) //model validations
+                {
+                    foreach (var item in ModelState.Values)
+                    {
+                        ModelState.AddModelError("", item.Errors[0].ErrorMessage.ToString());
+                    }
+                    return Json(ModelState);
+                }
+               
                 if (model.BrandId > 0) //Update
                 {
                     var objVM = objBrandMasterBs.Update(model);
@@ -62,5 +76,7 @@ namespace MyPOS.Web.Controllers
                 return Json(new JsonResponseVM { IsSuccess = false, Message = msg });
             }
         }
+
+        
     }
 }

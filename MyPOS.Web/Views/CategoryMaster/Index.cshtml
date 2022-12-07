@@ -1,26 +1,28 @@
 ﻿
-@model IEnumerable<MyPOS.ViewModels.BrandMasterVM>
+@model IEnumerable<MyPOS.ViewModels.CategoryMasterVM>
+
 
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 <script src="~/js/site.js"></script>
 <div class="container-fluid p-0">
     <div class="mb-3">
-            <h1 class="h3 d-inline align-middle">Brand List</h1>
-            <a id="createNew" onclick="brandAction.slideToggle()" class="badge bg-primary text-white ms-2" href="#" style="text-decoration:none; font-size: 14px;">
+            <h1 class="h3 d-inline align-middle">Category List</h1>
+            <a id="createNew" onclick="categoryAction.slideToggle()" class="badge bg-primary text-white ms-2" href="#" style="text-decoration:none; font-size: 14px;">
                 Create New
             </a>
       </div>
-        <div class="row pt-3" id="brandFormDiv">     
+        <div class="row pt-3" id="categoryFormDiv">     
 
             <div class="col-md-12 col-xl-12">
                 <div class="card mb-3">
                     <div class="card-body">
-                        <form id="brandForm">
+                        <form id="categoryForm">
                             <fieldset>
-                                <input type="hidden" name="BrandId" id="BrandId" />
+                                <input type="hidden" name="CategoryId" id="CategoryId" />
                                 <div class="form-group mb-3">
                                     <label class="form-label">Name</label>
                                     <input type="text" class="form-control" placeholder="Enter name" id="Name" name="Name" />
@@ -39,7 +41,7 @@
                                         <span class="form-check-label">Active</span>
                                     </label>
                                 </div>
-                                <button type="button" class="btn btn-success" id="btnSave" onclick="brandAction.Save()">Save</button>
+                                <button type="button" class="btn btn-success" id="btnSave" onclick="categoryAction.Save()">Save</button>
                             </fieldset>
                         </form>
                     </div>
@@ -58,18 +60,18 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="brandListDiv">
+                    <tbody id="categoryListDiv">
                     @if (Model != null && Model.Count() > 0)
                     {
                         foreach (var item in Model)
                         {
                             <tr>
-                                <td>@item.BrandId</td>
+                                <td>@item.CategoryId</td>
                                 <td>@item.Name</td>
                                 <td>@item.Description</td>
                                 <td>
-                                    <button type="button" class="btn btn-warning" onclick='brandAction.Edit(@item.BrandId, this)'> Edit </button> |
-                                    <button type="button" class="btn btn-danger" onclick='Delete(@item.BrandId, this)'> Delete </button>
+                                    <button type="button" class="btn btn-warning" onclick='categoryAction.Edit(@item.CategoryId, this)'> Edit </button> |
+                                    <button type="button" class="btn btn-danger" onclick='Delete(@item.CategoryId, this)'> Delete </button>
                                 </td>
                             </tr>
                         }
@@ -79,27 +81,17 @@
             </div>
         </div>
 </div>
-
 <style>
     .border-error {
         border: 1px solid red;
     }
 </style>
+
 <script>
-    //$('#createNew').click(function()
-    //{
-    //    $('#brandFormDiv').slideToggle();
-    //});
-
-    //function SlideToggle()
-    //{
-    //   $('#brandFormDiv').slideToggle();
-    //}
-
-    $(document).ready(function(){    
+  $(document).ready(function(){    
         var currentRow;
-    });
-        $('#brandForm').validate({
+  });
+        $('#categoryForm').validate({
             rules:
             {
                 Name: { required: true, maxlength: 30 },
@@ -133,22 +125,21 @@
             }
 
         });
-    
-  
-    var brandAction = 
+
+    var categoryAction = 
     {
         slideToggle: function(){
-             $('#brandFormDiv').slideToggle();
+             $('#categoryFormDiv').slideToggle();
         },
-        Edit: function(bid, element)
+        Edit: function(cid, element)
         {  
             debugger;
             currentRow = $(element).closest('tr'); // find
             
             $.ajax({
                 type: 'GET',
-                url: '@Url.Action("CreateOrEdit","BrandMaster")',
-                data: {id: bid},
+                url: '@Url.Action("CreateOrEdit","CategoryMaster")',
+                data: {id: cid},
                 success: function(response){
                 
                     if(response != undefined)
@@ -157,12 +148,12 @@
                          {
                              var data = response.data;
 
-                             $('#BrandId').val(data.brandId);
+                             $('#CategoryId').val(data.categoryId);
                              $('#Name').val(data.name);
                              $('#Description').val(data.description);
                              $('#IsActive').prop('checked', data.isActive);
 
-                             $('#brandFormDiv').slideToggle();
+                             $('#categoryFormDiv').slideToggle();
 
                          }
                          else
@@ -180,26 +171,21 @@
                   notyf.open({ type: 'error', message: err.statusText });
                }
             });
-
-
-            
         },
         Save: function(){    
             
             debugger;
-            if (!$('#brandForm').valid())  //check validation
+            if (!$('#categoryForm').valid())  //check validation
             {
                 return false;
             }
 
-                       
-
-            var bId = $('#BrandId').val();
+            var cId = $('#CategoryId').val();
 
             $.ajax({
                type: 'POST',
-               url: '@Url.Action("CreateOrEdit", "BrandMaster")', // /Controller/Index
-               data: $('#brandForm').serialize(),
+               url: '@Url.Action("CreateOrEdit", "CategoryMaster")', // /Controller/Index
+               data: $('#categoryForm').serialize(),
                success: function(response){
                     debugger;                   
                     if(response != undefined)
@@ -207,32 +193,32 @@
                          if(response.isSuccess)
                          {
                              var data = response.data;
-                             if(bId != '') //edit
+                             if(cId != '') //edit
                              {
                                     currentRow.find('td:eq(1)').text(data.name);
                                     currentRow.find('td:eq(2)').text(data.description);
 
                                       window.scrollTo(0, 0);
-                                      $('#brandForm')[0].reset();
-                                      $('#brandFormDiv').slideToggle();
+                                      $('#categoryForm')[0].reset();
+                                      $('#categoryFormDiv').slideToggle();
                                      notyf.open({ type: 'success', message: 'Record saved successfully.'  });
                              }
                              else //insert
                              {
                                  var row = `<tr>
-                                                        <td>${data.brandId}</td>
+                                                        <td>${data.categoryId}</td>
                                                         <td>${data.name}</td>
                                                         <td>${data.description}</td>
                                                         <td>
-                                                           <button type="button" class="btn btn-warning" onclick='brandAction.Edit(${data.brandId}, this)'> Edit </button> |
-                                                           <button type="button" class="btn btn-danger" onclick='Delete(${data.brandId}, this)'> Delete </button>
+                                                           <button type="button" class="btn btn-warning" onclick='categoryAction.Edit(${data.categoryId}, this)'> Edit </button> |
+                                                           <button type="button" class="btn btn-danger" onclick='Delete(${data.categoryId}, this)'> Delete </button>
                                                         </td>
                                                      </tr>`;
                                  
-                                      $('#brandListDiv').append(row);
+                                      $('#categoryListDiv').append(row);
                                       window.scrollTo(0, 0);
-                                      $('#brandForm')[0].reset();
-                                      $('#brandFormDiv').slideToggle();
+                                      $('#categoryForm')[0].reset();
+                                      $('#categoryFormDiv').slideToggle();
                                      notyf.open({ type: 'success', message: 'Record saved successfully.'  });
                              }
                                 
@@ -253,6 +239,9 @@
             });
         
         }
+    
     };
 
 </script>
+
+

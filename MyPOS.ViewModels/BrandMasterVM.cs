@@ -8,6 +8,8 @@ namespace MyPOS.ViewModels
     public class BrandMasterVM:BaseEntityVM
     {
         public int BrandId { get; set; }
+
+        [Required]        
         public string Name { get; set; }
         public string Description { get; set; }
 
