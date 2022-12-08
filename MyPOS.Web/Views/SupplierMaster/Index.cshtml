@@ -1,0 +1,236 @@
+﻿
+@model IEnumerable<MyPOS.ViewModels.SupplierMasterVM>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/js/site.js"></script>
+<div class="container-fluid p-0">
+      <div class="mb-3">
+            <h1 class="h3 d-inline align-middle">Supplier List</h1>
+            <a id="createNew" onclick="supplierAction.slideToggle()" class="badge bg-primary text-white ms-2" href="#" style="text-decoration:none; font-size: 14px;">
+                Create New
+            </a>
+      </div>
+       <div class="row pt-3" id="supplierFormDiv">
+           <div class="col-md-4 col-xl-3">
+                  <div class="card mb-3">
+                      <div class="card-body text-center">
+                          <input type="file" hidden name="SupplierImage" id="SupplierImage" onchange="supplierAction.UploadImage()" />
+                          <img class="img-fluid rounded-circle mb-2 img-responsive" width="128" height="128" alt="user" id="SupplierImageDiv" src="~/images/No_Image_Available.jpg">
+                          <h5 class="card-title mt-2 mb-3">Christina Mason</h5>
+                          <div>
+                              <button class="btn btn-primary btn-sm" onclick="supplierAction.SelectImage()">Upload Image</button>
+                          </div>
+                      </div>
+                  </div>
+            </div>
+
+            <div class="col-md-8 col-xl-9">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <form id="supplierForm" enctype="multipart/form-data">
+                                    <fieldset>
+                                        <input type="hidden" name="SupplierId" id="SupplierId" />
+                                        <input type="hidden" id="ImageMasterId" name="ImageMasterId" />
+
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">First Name</label>
+                                            <input type="text" class="form-control" placeholder="Enter first name" id="FirstName" name="FirstName" />
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" placeholder="Enter last name" id="LastName" name="LastName" />
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Description</label>
+                                            <textarea class="form-control" rows="2" placeholder="Enter description" id="Description" name="Description"></textarea>
+                                            <div class="form-text text-end">Max Character Limit: 250</div>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="text" class="form-control" placeholder="Enter email" id="Email" name="Email" />
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Contact</label>
+                                            <input type="text" class="form-control" placeholder="Enter contact" id="ContactNo" name="ContactNo" />
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Address</label>
+                                            <textarea class="form-control" rows="2" placeholder="Enter address" id="Address" name="Address"></textarea>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Status</label>
+                                            <label class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="true" id="IsActive" name="IsActive">
+                                                <span class="form-check-label">Active</span>
+                                            </label>
+                                        </div>
+                                        <button type="button" class="btn btn-success" id="btnSave">Save</button>
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+       </div>
+
+       <div class="row card pt-3">
+            <div class="col-md-12 col-xl-12">
+                <table class="table table-bordered table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Contact No</th>
+                            <th>Address</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="supplierListDiv">
+                    @if (Model != null && Model.Count() > 0)
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.SupplierId</td>
+                                <td>@item.FirstName</td>
+                                <td>@item.LastName</td>
+                                <td>@item.Email</td>
+                                <td>@item.ContactNo</td>
+                                <td>@item.Address</td>
+                                <td>
+                                     <button type="button" class="btn btn-warning" onclick='supplierAction.Edit(@item.SupplierId, this)'> Edit </button> |
+                                     <button type="button" class="btn btn-danger" onclick='Delete(@item.SupplierId, this)'> Delete </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+</div>
+<style>
+    .border-error {
+        border: 1px solid red;
+    }
+</style>
+<script>
+    $(document).ready(function(){
+      var currentRow;
+    });
+
+     $('#supplierForm').validate({
+            rules:
+            {
+                FirstName: { required: true },
+                Description:
+                {
+                    maxlength: 250
+                },
+                Email: {required: true, email: true},
+                ContactNo: "required"
+            },
+            messages:
+            {
+                FirstName: 
+                {
+                    required: "First Name is required.",
+                },
+                Description:
+                {
+                    maxlength: "You can only enter 250 characters."
+                },
+                Email: {
+                  required: "Email is required.",
+                  email: "Email format is incorrect."
+                },
+                ContactNo: "Contact No is required."
+            },
+            highlight: function (element) {
+                //debugger;
+                $(element).parent().addClass('text-danger');
+                $(element).parent().find('.form-control').addClass('border-error');
+            },
+            unhighlight: function (element) {
+                // debugger;
+                $(element).parent().removeClass('text-danger');
+                $(element).parent().find('.form-control').removeClass('border-error');
+            }
+
+        });
+
+        var supplierAction = 
+        {
+             SelectImage: function(){
+                $('#SupplierImage').trigger('click');
+             },
+             UploadImage: function()
+             {
+                 debugger;
+                 var file = document.getElementById('SupplierImage').files[0];
+             
+                 //Extension Valid
+                 //Size Valid
+                 var validImageExtensions = ["png","jpg","jpeg"];
+                 var isImageValid =true;
+
+                 var fileName = file.name; // abc.png
+                 var extension = fileName.split('.').pop();
+
+                 if($.inArray(extension, validImageExtensions) == -1 )
+                 {
+                    isImageValid = false;
+                 }
+
+                 if(isImageValid)
+                 {
+                     //ajax call
+                     var formData=  new FormData();
+                     formData.append("Image", file);
+
+                     $.ajax({
+                       type: 'POST',
+                       url: '@Url.Action("UploadSingleImage","Common")',
+                       data: formData,
+                       processData: false,
+                       contentType: false,
+                       success: function(response){
+                       
+                           if(response != undefined)
+                          {
+                               if(response.isSuccess)
+                               {
+                                   var data = response.data;
+
+                                   $('#ImageMasterId').val(data.imageId);
+                                   $('#SupplierImageDiv').attr('src', 'data:image/jpeg;base64,' + data.filePathStr);
+                               }
+                               else
+                              {
+                                 notyf.open({ type: 'error', message: response.message  });
+                              }
+                          }
+                          else        
+                         {
+                            notyf.open({ type: 'error', message: "Something went wrong." });
+                         }
+                       
+                       },
+                       error: function(err){ 
+                         notyf.open({ type: 'error', message: err.statusText });
+                       }
+                     });
+                 }
+             }
+        
+        
+        };
+
+</script>
+
+

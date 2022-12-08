@@ -13,9 +13,11 @@ namespace MyPOS.ViewModels
         public string Email { get; set; }
         public string ContactNo { get; set; }
         public string Address { get; set; }
+        public long ImageMasterId { get; set; } //fk
 
 
         //Navigation
+        public virtual SupplierMasterVM SupplierMaster { get; set; }
         public virtual List<ProductMasterVM> ProductMaster { get; set; }
     }
 }

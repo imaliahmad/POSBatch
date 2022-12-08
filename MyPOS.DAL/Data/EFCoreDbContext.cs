@@ -24,5 +24,6 @@ namespace MyPOS.DAL.Data
         public DbSet<CategoryMaster> CategoryMaster { get; set; }
         public DbSet<ProductMaster> ProductMaster { get; set; }
         public DbSet<SupplierMaster> SupplierMaster { get; set; }
+        public DbSet<ImageMaster> ImageMaster { get; set; }
     }
 }

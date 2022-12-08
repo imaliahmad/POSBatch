@@ -36,12 +36,14 @@ namespace MyPOS.Web
             services.AddTransient<ICategoryMasterDb, CategoryMasterDb>();
             services.AddTransient<ISupplierMasterDb, SupplierMasterDb>();
             services.AddTransient<IProductMasterDb, ProductMasterDb>();
+            services.AddTransient<IImageMasterDb, ImageMasterDb>();
             #endregion
             #region BLL Services
             services.AddTransient<IBrandMasterBs, BrandMasterBs>();
             services.AddTransient<ICategoryMasterBs, CategoryMasterBs>();
             services.AddTransient<ISupplierMasterBs, SupplierMasterBs>();
             services.AddTransient<IProductMasterBs, ProductMasterBs>();
+            services.AddTransient<IImageMasterBs, ImageMasterBs>();
             #endregion
         }
 
